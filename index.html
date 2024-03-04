@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class=" min-h-screen flex flex-col items-center bg-blue-100 font-cursive">
+
+    <div class="container mx-auto mt-8">
+        <h1 class="text-4xl font-bold text-blue-800 mb-6">Product Listing</h1>
+
+        <div id="Table" class="bg-blue-200 rounded shadow-lg overflow-hidden">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left py-3 bg-blue-300  text-s uppercase px-6 font-semibold text-blue-800 ">
+                            Product Name
+                        </th>
+                        <th class="text-left py-3 bg-blue-300  text-s uppercase px-6 font-semibold text-blue-800 ">
+                            Brand
+                        </th>
+                        <th class="text-left py-3 bg-blue-300  text-s uppercase px-6 font-semibold text-blue-800 ">
+                            Price
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="TableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-between mt-4">
+            <button id="prev" class="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded" disabled>Previous</button>
+            <button id="next" class="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">Next</button>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            const url = 'https://dummyjson.com/products?limit=100';
+            let currentPage = 0;
+            const itemsPerPage = 20;
+            let totalItems = 0;
+            let products = [];
+
+            const fetchProducts = async () => {
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    products = data.products;
+                    totalItems = products.length;
+                    displayProducts();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+
+            const displayProducts = () => {
+                const start = currentPage * itemsPerPage;
+                const end = start + itemsPerPage;
+                const paginatedItems = products.slice(start, end);
+
+                const tableBody = $('#TableBody');
+                tableBody.empty();
+
+                paginatedItems.forEach(product => {
+                    const row = `
+                        <tr class="border-b">
+                            <td class="py-3 whitespace-nowrap px-6 text-left">${product.title}</td>
+                            <td class="py-3 whitespace-nowrap px-6 text-left">${product.brand}</td>
+                            <td class="py-3 whitespace-nowrap px-6 text-left">$${product.price}</td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+
+                $('#prev').prop('disabled', currentPage === 0);
+                $('#next').prop('disabled', end >= totalItems);
+            };
+
+            $('#next').click(() => {
+                currentPage++;
+                displayProducts();
+            });
+
+            $('#prev').click(() => {
+                if (currentPage > 0) {
+                    currentPage--;
+                    displayProducts();
+                }
+            });
+
+            fetchProducts();
+        });
+       // custom config for the MTW app 
+       const mtwAppConfig = {
+            border: true // app border in the MTW page                    
+        }
+
+        ///////////////////////////////////////////////////////
+        // implement this functions in order to use private API        
+        const sendPrivateApiRequest = async () => {
+            // your code here:
+            // sendRequestToParent({ cat: 'getAssets' })
+        }        
+
+        const acceptPrivateApiResponse = async (data) => {
+            // process received data here:
+            // console.log(data)
+        }
+
+        // use this in order to send on document load
+        document.addEventListener('DOMContentLoaded', () => {
+            // your code here:
+            //sendRequestToParent({ method: 'getAssets' })
+        })
+        
+    </script>
+ <script src="https://morethanwallet.com/appstore/index.js"></script>
+</body>
+
+</html>
